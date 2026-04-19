@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, SkipForward, SkipBack, Music, X } from 'lucide-react';
@@ -14,7 +15,7 @@ const playlist = [
     id: 2,
     title: 'Abadi',
     artist: 'Perunggu',
-    src: '/public/music/abadi-perunggu.mp3' // FIXED (no spasi)
+    src: '/music/abadi-perunggu.mp3'
   }
 ];
 
@@ -22,9 +23,10 @@ export function MusicPlayer() {
   const [isOpen, setIsOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSong, setCurrentSong] = useState(0);
+
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // PLAY / PAUSE HANDLER
+  // 🎧 HANDLE PLAY / PAUSE
   useEffect(() => {
     if (!audioRef.current) return;
 
@@ -33,29 +35,41 @@ export function MusicPlayer() {
     } else {
       audioRef.current.pause();
     }
-  }, [isPlaying, currentSong]);
+  }, [isPlaying]);
 
-  // TOGGLE PLAY
+  // 🔥 IMPORTANT: reload audio saat lagu berubah
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    audioRef.current.pause();
+    audioRef.current.load();
+
+    if (isPlaying) {
+      audioRef.current.play().catch(() => setIsPlaying(false));
+    }
+  }, [currentSong]);
+
+  // ▶️ TOGGLE PLAY
   const togglePlay = (e?: any) => {
     if (e) e.stopPropagation();
     setIsPlaying((prev) => !prev);
   };
 
-  // NEXT SONG
+  // ⏭ NEXT SONG
   const nextSong = (e?: any) => {
     if (e) e.stopPropagation();
     setCurrentSong((prev) => (prev + 1) % playlist.length);
     setIsPlaying(true);
   };
 
-  // PREVIOUS SONG
+  // ⏮ PREV SONG
   const prevSong = (e?: any) => {
     if (e) e.stopPropagation();
     setCurrentSong((prev) => (prev - 1 + playlist.length) % playlist.length);
     setIsPlaying(true);
   };
 
-  // AUTO NEXT
+  // 🔁 AUTO NEXT
   const handleEnded = () => {
     setCurrentSong((prev) => (prev + 1) % playlist.length);
     setIsPlaying(true);
@@ -111,6 +125,7 @@ export function MusicPlayer() {
                     <div className="absolute inset-0 bg-rose-500/10 animate-pulse rounded-full" />
                   )}
                 </div>
+
                 <div className="overflow-hidden">
                   <h4 className="text-lg text-rose-900 truncate">
                     {playlist[currentSong].title}
@@ -121,7 +136,7 @@ export function MusicPlayer() {
                 </div>
               </div>
 
-              {/* PROGRESS (fake) */}
+              {/* PROGRESS FAKE */}
               <div className="h-1 bg-rose-100 rounded-full mb-5 overflow-hidden">
                 <motion.div
                   className="bg-rose-500 h-full"
