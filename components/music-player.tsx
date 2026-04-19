@@ -15,7 +15,7 @@ const playlist = [
     id: 2,
     title: 'Abadi',
     artist: 'Perunggu',
-    src: '/music/abadi-perunggu.mp3'
+    src: '/public/music/abadi-perunggu.mp3'
   }
 ];
 
